@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draze</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            color: #333;
+        }
+
+        .header-bar {
+            min-height: 48px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #ffffff;
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+        .header-bar .title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-bar .logo {
+            filter: invert(1);
+        }
+        .manual-btn {
+            padding: 6px 12px; font-size: 0.85rem; border-radius: 6px;
+            background-color: rgba(255,255,255,0.2); color: #fff;
+            border: 1px solid rgba(255,255,255,0.3); cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .manual-btn:hover { background-color: rgba(255,255,255,0.3); }
+
+        .app-body {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 300px;
+            min-width: 280px;
+            padding: 16px;
+            background-color: #ffffff;
+            overflow-y: auto;
+            border-right: 1px solid #d1d5db;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-section .head-label {
+            font-weight: 600; font-size: 0.95rem;
+            font-family: inherit;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+        .sidebar label {
+            display: block; margin-top: 12px; margin-bottom: 6px;
+            font-size: 0.8rem; font-weight: 500; color: #6b7280;
+        }
+        .sidebar input[type="text"],
+        .sidebar input[type="number"],
+        .sidebar input[type="range"],
+        .sidebar select,
+        .sidebar .color-chooser-btn {
+            width: 100%;
+            padding: 8px 10px; border-radius: 6px;
+            border: 1px solid #d1d5db;
+            margin-bottom: 10px; box-sizing: border-box;
+            font-size: 0.9rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sidebar input:focus, .sidebar select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+        .sidebar input[type="range"] { padding-left: 0; padding-right: 0; }
+
+        .coordinate-display-sidebar { margin-top: 10px; font-size: 0.85rem; }
+        .coordinate-display-sidebar span {
+            display: block; padding: 3px 0; font-weight: 400; color: #374151;
+        }
+        .range-value-display { font-weight: 500; color: #4f46e5; }
+
+        .main-content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 12px;
+            background-color: #f9fafb;
+        }
+        .main-content-area .head-label {
+            font-weight: 600; font-size: 1rem; color: #374151;
+            margin-bottom: 10px; text-align: center;
+            padding: 8px;
+            background-color: #e5e7eb;
+            border-radius: 6px;
+        }
+        .canvas-code-container {
+            flex-grow: 1; display: flex; overflow: hidden; gap: 12px;
+        }
+
+        .canvas-column {
+            flex: 3;
+            display: flex; justify-content: center; align-items: center;
+            padding: 0;
+            overflow: auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        #visualizerCanvas {
+            border: 1px solid #e5e7eb;
+            max-width: 100%; max-height: 100%;
+            border-radius: 6px;
+            display: block;
+        }
+
+        .code-preview-column {
+            flex: 2;
+            display: flex; flex-direction: column;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .code-preview-column .head-label-small {
+             font-weight: 500; font-size: 0.9rem; margin-bottom: 8px;
+             color: #4b5563; text-align: center;
+        }
+        #codePreviewArea {
+            flex-grow: 1; width: 100%; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            font-size: 0.8rem;
+            border: 1px solid #e5e7eb; padding: 10px; box-sizing: border-box;
+            white-space: pre; overflow: auto; background-color: #f9fafb;
+            border-radius: 6px; color: #1f2937;
+        }
+
+        .bottom-bar {
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px 20px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            min-height: 40px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+            gap: 10px;
+        }
+        .bottom-bar-section { display: flex; gap: 8px; }
+        .bottom-bar-section.left { justify-content: flex-start; }
+        .bottom-bar-section.center { justify-content: center; }
+        .bottom-bar-section.right { justify-content: flex-end; }
+
+        .btn {
+            padding: 8px 16px; border-radius: 6px;
+            border: none; cursor: pointer;
+            font-weight: 500; font-size: 0.85rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            color: #ffffff;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        .btn:focus { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(255,255,255,0.5); }
+        .btn:active { transform: translateY(1px); }
+
+        .draw-btn { background-color: #10b981; } .draw-btn:hover { background-color: #059669; }
+        .clear-btn { background-color: #ef4444; } .clear-btn:hover { background-color: #dc2626; }
+        .undo-btn, .redo-btn { background-color: #f59e0b; } .undo-btn:hover, .redo-btn:hover { background-color: #d97706; }
+
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: #ffffff; margin: 10% auto; padding: 24px;
+            border: 1px solid #d1d5db; width: 90%; max-width: 600px;
+            border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center;
+             border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 16px; }
+        .modal-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .modal-close-btn { font-size: 1.5rem; font-weight: bold; cursor: pointer; border: none; background: none; color: #9ca3af;}
+        .modal-close-btn:hover { color: #6b7280; }
+        .modal-body { font-size: 0.9rem; line-height: 1.6; color: #374151; }
+        .modal-body h4 { font-size: 1rem; font-weight: 600; margin-top: 16px; margin-bottom: 8px; color: #111827; }
+        .modal-body ul, .modal-body ol { padding-left: 20px; margin-bottom: 16px; }
+        .modal-body li { margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+
+    <header class="header-bar">
+        <div class="title-group">
+             <svg class="logo" width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <span>Draze</span>
+        </div>
+        <button id="userManualBtn" class="manual-btn">User Manual</button>
+    </header>
+
+    <div class="app-body">
+        <aside class="sidebar">
+            <div class="sidebar-section" id="tools-section">
+                <div class="head-label">TOOLS</div>
+                <label for="shape-selector">Select Shape:</label>
+                <select id="shape-selector"></select>
+                <div id="dynamic-inputs"></div>
+            </div>
+
+            <div class="sidebar-section" id="toolbar-section">
+                <div class="head-label">INFO & PROPERTIES</div>
+                <div class="coordinate-display-sidebar">
+                    <span id="x-coord-sidebar">X: --</span>
+                    <span id="y-coord-sidebar">Y: --</span>
+                </div>
+                <label for="color-picker">Choose Colour:</label>
+                <input type="color" id="color-picker" class="color-chooser-btn" value="#4f46e5">
+                <label for="line-width">Choose Width: <span id="line-width-value" class="range-value-display">2.0</span></label>
+                <input type="range" id="line-width" min="1" max="10" step="0.5" value="2.0">
+            </div>
+        </aside>
+
+        <main class="main-content-area">
+            <div class="head-label">CANVAS</div>
+            <div class="canvas-code-container">
+                <section class="canvas-column">
+                    <canvas id="visualizerCanvas" width="600" height="450"></canvas>
+                </section>
+                <section class="code-preview-column">
+                    <div class="head-label-small">Figure Data (JSON)</div>
+                    <textarea id="codePreviewArea" readonly placeholder="Drawn figures data will appear here..."></textarea>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bottom-bar">
+        <div class="bottom-bar-section left">
+            <button id="draw-button" class="btn draw-btn">Draw (Ctrl+D)</button>
+        </div>
+        <div class="bottom-bar-section center">
+            <button id="undo-button" class="btn undo-btn">Undo (Ctrl+Z)</button>
+            <button id="redo-button" class="btn redo-btn">Redo (Ctrl+Y)</button>
+        </div>
+        <div class="bottom-bar-section right">
+            <button id="clear-button" class="btn clear-btn">Clear (Ctrl+C)</button>
+        </div>
+    </footer>
+
+    <div id="userManualModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">User Manual</span>
+                <button id="modalCloseBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Welcome to Draze! This tool allows you to draw various geometric shapes on a canvas.</p>
+                <h4>Keyboard Shortcuts:</h4>
+                <ul>
+                    <li><strong>Ctrl + D:</strong> Draw the selected figure.</li>
+                    <li><strong>Ctrl + Z:</strong> Undo the last action.</li>
+                    <li><strong>Ctrl + Y:</strong> Redo the last undone action.</li>
+                    <li><strong>Ctrl + C:</strong> Clear all figures from the canvas.</li>
+                </ul>
+                <h4>Basic Usage:</h4>
+                <ol>
+                    <li>Select a figure type from the "Select Shape" dropdown in the "TOOLS" panel.</li>
+                    <li>Enter the required dimensions for the selected shape.</li>
+                    <li>Choose a color and line thickness.</li>
+                    <li>Click "Draw" or press Ctrl+D.</li>
+                </ol>
+                 <p style="margin-top: 16px; font-size: 0.8rem; text-align: center; color: #6b7280;">Happy Drawing!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let figures = [];
+        let redoStack = [];
+        let selectedColor = '#4f46e5';
+        let selectedLineWidth = 2.0;
+        let canvas, ctx, canvasWidth = 600, canvasHeight = 450, canvasCenterX, canvasCenterY;
+        const gridSpacing = 20;
+
+        let shapeSelector, dynamicInputsContainer, colorPicker, lineWidthInput, lineWidthValueDisplay;
+        let drawButton, clearButton, undoButton, redoButton;
+        let xCoordSidebarDisplay, yCoordSidebarDisplay, codePreviewArea;
+        let userManualBtn, userManualModal, modalCloseBtn;
+
+        const shapeDefinitions = {
+            "select": { text: "Select Figure...", params: [] },
+            "point":  { text: "POINT", params: [ {name:"x", label:"X:", placeholder:"x-coordinate"}, {name:"y", label:"Y:", placeholder:"y-coordinate"} ] },
+            "line":   { text: "LINE", params: [ {name:"x1", label:"X1:", placeholder:"x1-coordinate"}, {name:"y1", label:"Y1:", placeholder:"y1-coordinate"}, {name:"x2", label:"X2:", placeholder:"x2-coordinate"}, {name:"y2", label:"Y2:", placeholder:"y2-coordinate"} ] },
+            "arc":    { text: "ARC", params: [ {name:"centerX", label:"Center X:", placeholder:"x-coord of center"}, {name:"centerY", label:"Center Y:", placeholder:"y-coord of center"}, {name:"radius", label:"Radius (R):", placeholder:"Radius of arc"}, {name:"startAngle", label:"Start Angle (A1):", placeholder:"Angle1 in degrees"}, {name:"endAngle", label:"End Angle (A2):", placeholder:"Angle2 in degrees"} ] },
+            "circle": { text: "CIRCLE", params: [ {name:"centerX", label:"Center X:", placeholder:"x-coordinate"}, {name:"centerY", label:"Center Y:", placeholder:"y-coordinate"}, {name:"radius", label:"Radius (R):", placeholder:"Radius"} ] },
+            "triangle": { text: "TRIANGLE", params: [ {name:"x1", label:"X1:", placeholder:"x1-coordinate"}, {name:"y1", label:"Y1:", placeholder:"y1-coordinate"}, {name:"x2", label:"X2:", placeholder:"x2-coordinate"}, {name:"y2", label:"Y2:", placeholder:"y2-coordinate"}, {name:"x3", label:"X3:", placeholder:"x3-coordinate"}, {name:"y3", label:"Y3:", placeholder:"y3-coordinate"} ] },
+            "rectangle":{ text: "RECTANGLE", params: [ {name:"centerX", label:"Center X:", placeholder:"x-coord of center"}, {name:"centerY", label:"Center Y:", placeholder:"y-coord of center"}, {name:"width", label:"Width (W):", placeholder:"Width"}, {name:"height", label:"Height (H):", placeholder:"Height"} ] },
+            "ellipse":  { text: "ELLIPSE", params: [ {name:"centerX", label:"Center X:", placeholder:"x-coord of center"}, {name:"centerY", label:"Center Y:", placeholder:"y-coord of center"}, {name:"radiusX", label:"Radius X (Lx):", placeholder:"Horizontal radius"}, {name:"radiusY", label:"Radius Y (Ly):", placeholder:"Vertical radius"} ] },
+            "h_parabola":{ text: "HORIZONTAL PARABOLA", params: [ {name:"focusX", label:"Focus X (Fx):", placeholder:"x-coord of focus"}, {name:"focusY", label:"Focus Y (Fy):", placeholder:"y-coord of focus"}, {name:"latusRectum", label:"Latus Rectum (LR):", placeholder:"Length of Latus Rectum"} ] },
+            "v_parabola":{ text: "VERTICAL PARABOLA", params: [ {name:"focusX", label:"Focus X (Fx):", placeholder:"x-coord of focus"}, {name:"focusY", label:"Focus Y (Fy):", placeholder:"y-coord of focus"}, {name:"latusRectum", label:"Latus Rectum (LR):", placeholder:"Length of Latus Rectum"} ] },
+            "h_hyperbola":{ text: "HORIZONTAL HYPERBOLA", params: [ {name:"centerX", label:"Center X:", placeholder:"x-coord of center"}, {name:"centerY", label:"Center Y:", placeholder:"y-coord of center"}, {name:"aAxis", label:"Transverse Axis (a):", placeholder:"Distance center to transverse axis"}, {name:"bAxis", label:"Conjugate Axis (b):", placeholder:"Distance center to conjugate axis"} ] },
+            "v_hyperbola":{ text: "VERTICAL HYPERBOLA", params: [ {name:"centerX", label:"Center X:", placeholder:"x-coord of center"}, {name:"centerY", label:"Center Y:", placeholder:"y-coord of center"}, {name:"aAxis", label:"Transverse Axis (a):", placeholder:"Distance center to transverse axis"}, {name:"bAxis", label:"Conjugate Axis (b):", placeholder:"Distance center to conjugate axis"} ] },
+            "cycloid":  { text: "CYCLOID", params: [ {name:"startX", label:"Start X:", placeholder:"x-coord of start point"}, {name:"startY", label:"Start Y:", placeholder:"y-coord of start point"}, {name:"radius", label:"Radius (R):", placeholder:"Radius of rolling circle"}, {name:"revolutions", label:"Revolutions (Rv):", placeholder:"Number of revolutions"} ] },
+            "epicycloid":{ text: "EPICYCLOID", params: [ {name:"centerX", label:"Fixed Center X:", placeholder:"x-coord of fixed circle center"}, {name:"centerY", label:"Fixed Center Y:", placeholder:"y-coord of fixed circle center"}, {name:"revolvingR", label:"Revolving Radius (Rv):", placeholder:"Radius of revolving circle"}, {name:"fixedR", label:"Fixed Radius (Rf):", placeholder:"Radius of fixed circle"} ] },
+            "hypocycloid":{ text: "HYPOCYCLOID", params: [ {name:"centerX", label:"Fixed Center X:", placeholder:"x-coord of fixed circle center"}, {name:"centerY", label:"Fixed Center Y:", placeholder:"y-coord of fixed circle center"}, {name:"revolvingR", label:"Revolving Radius (Rv):", placeholder:"Radius of revolving circle"}, {name:"fixedR", label:"Fixed Radius (Rf):", placeholder:"Radius of fixed circle"} ] },
+            "spiral":   { text: "SPIRAL", params: [ {name:"centerX", label:"Center X:", placeholder:"x-coord of center"}, {name:"centerY", label:"Center Y:", placeholder:"y-coord of center"}, {name:"radiusFactor", label:"Radius Factor (R):", placeholder:"Expansion factor per turn"}, {name:"turns", label:"Turns (T):", placeholder:"Number of turns"} ] },
+            "mirror_image":{ text: "MIRROR IMAGE (Point)", params: [ {name:"pointX", label:"Point X:", placeholder:"x-coord of point"}, {name:"pointY", label:"Point Y:", placeholder:"y-coord of point"}, {name:"lineM", label:"Line Slope (m):", placeholder:"Slope of line (y=mx+c)"}, {name:"lineC", label:"Line Intercept (c):", placeholder:"Y-intercept (y=mx+c)"} ] }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            canvas = document.getElementById('visualizerCanvas');
+            const canvasContainer = document.querySelector('.canvas-column');
+            function resizeCanvas() {
+                const containerWidth = canvasContainer.clientWidth - 2;
+                const containerHeight = canvasContainer.clientHeight - 2;
+                const aspectRatio = 4 / 3;
+                let newWidth = containerWidth;
+                let newHeight = containerWidth / aspectRatio;
+                if (newHeight > containerHeight) {
+                    newHeight = containerHeight;
+                    newWidth = containerHeight * aspectRatio;
+                }
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                canvasWidth = newWidth;
+                canvasHeight = newHeight;
+                updateCanvasCenter();
+                redrawCanvasAndPreview();
+            }
+            window.addEventListener('resize', resizeCanvas);
+            ctx = canvas.getContext('2d');
+            
+            shapeSelector = document.getElementById('shape-selector');
+            for (const key in shapeDefinitions) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = shapeDefinitions[key].text;
+                shapeSelector.appendChild(option);
+            }
+
+            dynamicInputsContainer = document.getElementById('dynamic-inputs');
+            colorPicker = document.getElementById('color-picker');
+            lineWidthInput = document.getElementById('line-width');
+            lineWidthValueDisplay = document.getElementById('line-width-value');
+            drawButton = document.getElementById('draw-button');
+            clearButton = document.getElementById('clear-button');
+            undoButton = document.getElementById('undo-button');
+            redoButton = document.getElementById('redo-button');
+            xCoordSidebarDisplay = document.getElementById('x-coord-sidebar');
+            yCoordSidebarDisplay = document.getElementById('y-coord-sidebar');
+            codePreviewArea = document.getElementById('codePreviewArea');
+            userManualBtn = document.getElementById('userManualBtn');
+            userManualModal = document.getElementById('userManualModal');
+            modalCloseBtn = document.getElementById('modalCloseBtn');
+
+            shapeSelector.addEventListener('change', () => updateDynamicInputs());
+            colorPicker.addEventListener('input', (e) => selectedColor = e.target.value);
+            lineWidthInput.addEventListener('input', (e) => {
+                selectedLineWidth = parseFloat(e.target.value);
+                lineWidthValueDisplay.textContent = selectedLineWidth.toFixed(1);
+            });
+
+            drawButton.addEventListener('click', handleDraw);
+            clearButton.addEventListener('click', handleClear);
+            undoButton.addEventListener('click', handleUndo);
+            redoButton.addEventListener('click', handleRedo);
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const mouseX = (e.clientX - rect.left) * scaleX;
+                const mouseY = (e.clientY - rect.top) * scaleY;
+                const displayX = mouseX - canvasCenterX;
+                const displayY = canvasCenterY - mouseY;
+                xCoordSidebarDisplay.textContent = `X: ${displayX.toFixed(0)}`;
+                yCoordSidebarDisplay.textContent = `Y: ${displayY.toFixed(0)}`;
+            });
+            canvas.addEventListener('mouseleave', () => {
+                xCoordSidebarDisplay.textContent = "X: --";
+                yCoordSidebarDisplay.textContent = "Y: --";
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'number') {
+                    if (e.key.toLowerCase() === 'd' || e.key.toLowerCase() === 'z' || e.key.toLowerCase() === 'y' || e.key.toLowerCase() === 'c') {
+                        if (!e.ctrlKey) return;
+                    }
+                }
+                if (e.ctrlKey) {
+                    let handled = false;
+                    switch (e.key.toLowerCase()) {
+                        case 'd': handleDraw(); handled = true; break;
+                        case 'z': handleUndo(); handled = true; break;
+                        case 'y': handleRedo(); handled = true; break;
+                        case 'c': handleClear(); handled = true; break;
+                    }
+                    if (handled) e.preventDefault();
+                }
+            });
+
+            userManualBtn.addEventListener('click', () => userManualModal.style.display = "block");
+            modalCloseBtn.addEventListener('click', () => userManualModal.style.display = "none");
+            window.addEventListener('click', (event) => {
+                if (event.target == userManualModal) userManualModal.style.display = "none";
+            });
+
+            lineWidthValueDisplay.textContent = selectedLineWidth.toFixed(1);
+            colorPicker.value = selectedColor;
+            updateDynamicInputs();
+            resizeCanvas();
+        });
+
+        function updateCanvasCenter() {
+            canvasCenterX = canvas.width / 2;
+            canvasCenterY = canvas.height / 2;
+        }
+
+        function updateDynamicInputs() {
+            dynamicInputsContainer.innerHTML = '';
+            const selectedShapeKey = shapeSelector.value;
+            const definition = shapeDefinitions[selectedShapeKey];
+            if (definition && definition.params.length > 0) {
+                definition.params.forEach(param => {
+                    const labelEl = document.createElement('label');
+                    labelEl.htmlFor = `input-${param.name}`;
+                    labelEl.textContent = param.label;
+                    const inputEl = document.createElement('input');
+                    inputEl.type = 'number';
+                    inputEl.id = `input-${param.name}`;
+                    inputEl.name = param.name;
+                    inputEl.placeholder = param.placeholder;
+                    inputEl.value = (param.name.includes('radius') || param.name.includes('Radius') || param.name.includes('width') || param.name.includes('height') || param.name.includes('latus') || param.name.includes('revolutions') || param.name === 'fixedR' || param.name.includes('Axis')) ? 50 : (param.name === 'revolvingR') ? 20 : (param.name.includes('turns') || param.name.includes('Factor')) ? 2 : (param.name === 'endAngle') ? 90 : 0;
+                    dynamicInputsContainer.appendChild(labelEl);
+                    dynamicInputsContainer.appendChild(inputEl);
+                });
+            }
+        }
+        
+        function showCustomMessage(title, message, type = "info") {
+             const existingMsg = document.querySelector('.custom-message-box');
+             if (existingMsg) document.body.removeChild(existingMsg);
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `custom-message-box ${type}`;
+            msgDiv.innerHTML = `<strong style="display:block; margin-bottom: 5px;">${title}</strong> ${message}`;
+            document.body.appendChild(msgDiv);
+            setTimeout(() => { msgDiv.classList.add('show'); }, 10);
+            setTimeout(() => {
+                msgDiv.classList.remove('show');
+                setTimeout(() => document.body.removeChild(msgDiv), 500);
+            }, 3500);
+        }
+
+        function handleDraw() {
+            const shapeType = shapeSelector.value;
+            if (shapeType === "select") {
+                showCustomMessage("Selection Needed", "Please select a figure to draw.", "info");
+                return;
+            }
+            const inputElements = document.querySelectorAll('#dynamic-inputs input');
+            const params = {};
+            let allInputsValid = true;
+            inputElements.forEach(input => {
+                if (input.value.trim() === "" || isNaN(parseFloat(input.value))) {
+                    allInputsValid = false;
+                }
+                params[input.name] = parseFloat(input.value);
+            });
+            if (!allInputsValid) {
+                 showCustomMessage("Invalid Input", "Please ensure all fields have valid numbers.", "error");
+                return;
+            }
+            const figure = { type: shapeType, params: params, color: selectedColor, lineWidth: selectedLineWidth };
+            figures.push(figure);
+            redoStack = [];
+            redrawCanvasAndPreview();
+        }
+
+        function handleClear() { figures = []; redoStack = []; redrawCanvasAndPreview(); }
+        function handleUndo() { if (figures.length > 0) { redoStack.push(figures.pop()); redrawCanvasAndPreview(); } }
+        function handleRedo() { if (redoStack.length > 0) { figures.push(redoStack.pop()); redrawCanvasAndPreview(); } }
+
+        function redrawCanvasAndPreview() { redrawCanvas(); updateCodePreview(); }
+        function updateCodePreview() {
+             codePreviewArea.value = figures.length > 0 ? JSON.stringify(figures, null, 2) : "";
+             codePreviewArea.placeholder = figures.length > 0 ? "" : "Drawn figures data will appear here...";
+        }
+
+        function drawGridAndAxes() {
+            ctx.save();
+            ctx.strokeStyle = "#e9ecef"; ctx.lineWidth = 0.5;
+            for (let x = canvasCenterX % gridSpacing; x <= canvasWidth; x += gridSpacing) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasHeight); ctx.stroke(); }
+            for (let y = canvasCenterY % gridSpacing; y <= canvasHeight; y += gridSpacing) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvasWidth, y); ctx.stroke(); }
+            ctx.strokeStyle = "#adb5bd"; ctx.lineWidth = 1.5;
+            const arrowHeadSize = 8;
+            ctx.beginPath(); ctx.moveTo(canvasCenterX, 0); ctx.lineTo(canvasCenterX, canvasHeight); ctx.stroke();
+            drawArrowHead(ctx, canvasCenterX, arrowHeadSize, canvasCenterX, 0, arrowHeadSize);
+            ctx.beginPath(); ctx.moveTo(0, canvasCenterY); ctx.lineTo(canvasWidth, canvasCenterY); ctx.stroke();
+            drawArrowHead(ctx, canvasWidth - arrowHeadSize, canvasCenterY, canvasWidth, canvasCenterY, arrowHeadSize);
+            ctx.restore();
+        }
+        
+        function drawArrowHead(ctx, fromX, fromY, toX, toY, arrowSize) {
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            ctx.save(); ctx.beginPath(); ctx.lineWidth = 1.5;
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - arrowSize * Math.cos(angle - Math.PI / 6), toY - arrowSize * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - arrowSize * Math.cos(angle + Math.PI / 6), toY - arrowSize * Math.sin(angle + Math.PI / 6));
+            ctx.stroke(); ctx.restore();
+        }
+
+        function redrawCanvas() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            drawGridAndAxes();
+            figures.forEach(fig => {
+                ctx.save();
+                ctx.strokeStyle = fig.color;
+                ctx.fillStyle = fig.color;
+                ctx.lineWidth = fig.lineWidth;
+                const p = fig.params;
+                const T = (ux, uy) => ({ x: canvasCenterX + ux, y: canvasCenterY - uy });
+                const toRad = (deg) => deg * Math.PI / 180;
+
+                switch (fig.type) {
+                    case 'point': { const pos = T(p.x, p.y); ctx.beginPath(); ctx.arc(pos.x, pos.y, Math.max(2, fig.lineWidth / 2), 0, 2 * Math.PI); ctx.fill(); break; }
+                    case 'line': { const p1 = T(p.x1, p.y1), p2 = T(p.x2, p.y2); ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); break; }
+                    case 'circle': { const center = T(p.centerX, p.centerY); ctx.beginPath(); ctx.arc(center.x, center.y, p.radius, 0, 2 * Math.PI); ctx.stroke(); break; }
+                    case 'rectangle': { const topLeft = T(p.centerX - p.width / 2, p.centerY + p.height / 2); ctx.strokeRect(topLeft.x, topLeft.y, p.width, p.height); break; }
+                    case 'ellipse': { const center = T(p.centerX, p.centerY); ctx.beginPath(); ctx.ellipse(center.x, center.y, p.radiusX, p.radiusY, 0, 0, 2 * Math.PI); ctx.stroke(); break; }
+                    case 'triangle': { const p1 = T(p.x1, p.y1); const p2 = T(p.x2, p.y2); const p3 = T(p.x3, p.y3); ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y); ctx.closePath(); ctx.stroke(); break; }
+                    case 'arc': { const center = T(p.centerX, p.centerY); ctx.beginPath(); ctx.arc(center.x, center.y, p.radius, -toRad(p.endAngle), -toRad(p.startAngle)); ctx.stroke(); break; }
+                    case 'h_parabola': {
+                        const a = p.latusRectum / 4; const h = p.focusX - a; const k = p.focusY;
+                        ctx.beginPath();
+                        for (let dy = -canvasHeight / 2; dy <= canvasHeight / 2; dy++) {
+                            const y = k + dy;
+                            const x = h + (dy * dy) / (4 * a);
+                            const p_ = T(x, y);
+                            if (dy === -canvasHeight / 2) ctx.moveTo(p_.x, p_.y); else ctx.lineTo(p_.x, p_.y);
+                        }
+                        ctx.stroke(); break;
+                    }
+                    case 'v_parabola': {
+                        const a = p.latusRectum / 4; const h = p.focusX; const k = p.focusY - a;
+                        ctx.beginPath();
+                        for (let dx = -canvasWidth / 2; dx <= canvasWidth / 2; dx++) {
+                            const x = h + dx;
+                            const y = k + (dx * dx) / (4 * a);
+                            const p_ = T(x, y);
+                            if (dx === -canvasWidth / 2) ctx.moveTo(p_.x, p_.y); else ctx.lineTo(p_.x, p_.y);
+                        }
+                        ctx.stroke(); break;
+                    }
+                    case 'h_hyperbola': {
+                        const { centerX: h, centerY: k, aAxis: a, bAxis: b } = p;
+                        if (a <= 0 || b <= 0) break;
+                        ctx.beginPath();
+                        for (let dy = -canvasHeight / 2; dy <= canvasHeight / 2; dy++) {
+                            const y = k + dy;
+                            const x_offset = a * Math.sqrt(1 + (dy * dy) / (b * b));
+                            const p_ = T(h + x_offset, y);
+                            if (dy === -canvasHeight / 2) ctx.moveTo(p_.x, p_.y); else ctx.lineTo(p_.x, p_.y);
+                        }
+                        for (let dy = canvasHeight / 2; dy >= -canvasHeight/2; dy--) {
+                             const y = k + dy;
+                             const x_offset = a * Math.sqrt(1 + (dy * dy) / (b * b));
+                             const p_ = T(h - x_offset, y);
+                             ctx.lineTo(p_.x, p_.y);
+                        }
+                        ctx.stroke(); break;
+                    }
+                    case 'v_hyperbola': {
+                        const { centerX: h, centerY: k, aAxis: a, bAxis: b } = p;
+                        if (a <= 0 || b <= 0) break;
+                        ctx.beginPath();
+                        for (let dx = -canvasWidth / 2; dx <= canvasWidth / 2; dx++) {
+                            const x = h + dx;
+                            const y_offset = a * Math.sqrt(1 + (dx * dx) / (b * b));
+                            const p_ = T(x, k + y_offset);
+                            if (dx === -canvasWidth / 2) ctx.moveTo(p_.x, p_.y); else ctx.lineTo(p_.x, p_.y);
+                        }
+                        for (let dx = canvasWidth / 2; dx >= -canvasWidth/2; dx--) {
+                             const x = h + dx;
+                             const y_offset = a * Math.sqrt(1 + (dx * dx) / (b * b));
+                             const p_ = T(x, k - y_offset);
+                             ctx.lineTo(p_.x, p_.y);
+                        }
+                        ctx.stroke(); break;
+                    }
+                    case 'cycloid': {
+                        const { startX, startY, radius: r, revolutions } = p;
+                        if (r <= 0) break;
+                        ctx.beginPath();
+                        const maxT = revolutions * 2 * Math.PI;
+                        for (let t = 0; t <= maxT; t += 0.01) {
+                            const x = startX + r * (t - Math.sin(t));
+                            const y = startY + r * (1 - Math.cos(t));
+                            const p_ = T(x, y);
+                            if (t === 0) ctx.moveTo(p_.x, p_.y); else ctx.lineTo(p_.x, p_.y);
+                        }
+                        ctx.stroke(); break;
+                    }
+                     case 'epicycloid': {
+                        const { centerX: cx, centerY: cy, revolvingR: r, fixedR: R } = p;
+                        if (r <= 0 || R <= 0) break;
+                        ctx.beginPath();
+                        for (let t = 0; t <= 2 * Math.PI * r; t += 0.01) {
+                            const x = cx + (R + r) * Math.cos(t) - r * Math.cos((R + r) * t / r);
+                            const y = cy + (R + r) * Math.sin(t) - r * Math.sin((R + r) * t / r);
+                            const p_ = T(x, y);
+                            if (t === 0) ctx.moveTo(p_.x, p_.y); else ctx.lineTo(p_.x, p_.y);
+                        }
+                        ctx.stroke(); break;
+                    }
+                    case 'hypocycloid': {
+                        const { centerX: cx, centerY: cy, revolvingR: r, fixedR: R } = p;
+                        if (r <= 0 || R <= 0 || r >= R) break;
+                        ctx.beginPath();
+                        for (let t = 0; t <= 2 * Math.PI * r; t += 0.01) {
+                            const x = cx + (R - r) * Math.cos(t) + r * Math.cos((R - r) * t / r);
+                            const y = cy + (R - r) * Math.sin(t) - r * Math.sin((R - r) * t / r);
+                            const p_ = T(x, y);
+                            if (t === 0) ctx.moveTo(p_.x, p_.y); else ctx.lineTo(p_.x, p_.y);
+                        }
+                        ctx.stroke(); break;
+                    }
+                     case 'spiral': {
+                        const { centerX: cx, centerY: cy, radiusFactor: rf, turns } = p;
+                        ctx.beginPath();
+                        const maxTheta = turns * 2 * Math.PI;
+                        for (let theta = 0; theta <= maxTheta; theta += 0.01) {
+                            const radius = rf * theta / (2 * Math.PI);
+                            const x = cx + radius * Math.cos(theta);
+                            const y = cy + radius * Math.sin(theta);
+                            const p_ = T(x, y);
+                            if (theta === 0) ctx.moveTo(p_.x, p_.y); else ctx.lineTo(p_.x, p_.y);
+                        }
+                        ctx.stroke(); break;
+                    }
+                    case 'mirror_image': {
+                        const { pointX, pointY, lineM: m, lineC: c } = p;
+                        const origPoint = T(pointX, pointY);
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(128,128,128,0.7)';
+                        ctx.beginPath(); ctx.arc(origPoint.x, origPoint.y, Math.max(2, fig.lineWidth / 2 + 1), 0, 2 * Math.PI); ctx.fill();
+                        const xUser1 = -canvasWidth, yUser1 = m * xUser1 + c;
+                        const xUser2 = canvasWidth, yUser2 = m * xUser2 + c;
+                        const lineP1 = T(xUser1, yUser1), lineP2 = T(xUser2, yUser2);
+                        ctx.strokeStyle = 'rgba(128,128,128,0.5)'; ctx.lineWidth = Math.max(1, fig.lineWidth / 2);
+                        ctx.beginPath(); ctx.moveTo(lineP1.x, lineP1.y); ctx.lineTo(lineP2.x, lineP2.y); ctx.stroke();
+                        ctx.restore();
+                        const d = (m * pointX - pointY + c) / (m * m + 1);
+                        const mirrorXUser = pointX - 2 * m * d;
+                        const mirrorYUser = pointY + 2 * d;
+                        const mirrorPoint = T(mirrorXUser, mirrorYUser);
+                        ctx.beginPath(); ctx.arc(mirrorPoint.x, mirrorPoint.y, Math.max(2, fig.lineWidth / 2), 0, 2 * Math.PI); ctx.fill();
+                        break;
+                    }
+                    default: break;
+                }
+                ctx.restore();
+            });
+        }
+    </script>
+</body>
+</html>
