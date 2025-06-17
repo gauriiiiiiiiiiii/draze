@@ -1,55 +1,84 @@
-# 🎨 DRAZE - Interactive Drawing Application
+# 🎨 DRAZE 
+Interactive Geometric Drawing Application
 
-A modern, feature-rich drawing application built with React and Material-UI
+A powerful and intuitive drawing application that combines the precision of geometric shapes with the flexibility of free-form drawing. Built with React and GTK, DRAZE offers a unique blend of web and native capabilities.
 
-## ✨ Features
+## ✨ Key Features
 
-- 🖌️ **Drawing Tools**
-  - Smooth drawing experience
-  - Adjustable line width
-  - Color picker with presets
-  - Custom color selection
+### 🎯 Drawing Capabilities
+- **Geometric Shapes** 📐
+  - Points, Lines, Circles, Arcs
+  - Rectangles, Triangles, Ellipses
+  - Parabolas (Horizontal & Vertical)
+  - Hyperbolas (Horizontal & Vertical)
+  - Special Curves (Cycloid, Epicycloid, Hypocycloid)
+  - Spirals and Mirror Images
 
-- 🔄 **History Management**
-  - Undo/Redo functionality
+### 🛠️ Advanced Tools
+- **Precision Controls** 📏
+  - Coordinate-based positioning
+  - Real-time coordinate display
+  - Grid system for alignment
+  - Customizable line width
+  - Color picker with RGB support
+
+### 🔄 History Management
+- **Undo/Redo System** ↩️
+  - Unlimited undo/redo operations
   - Clear canvas option
-  - Save drawings as PNG
+  - State preservation
+  - Figure stack management
 
-- 🎯 **User Interface**
-  - Clean, modern design
-  - Responsive layout
-  - Intuitive controls
-  - Real-time color preview
+### 🎨 User Interface
+- **Modern Design** 💫
+  - Clean, intuitive layout
+  - Responsive canvas
+  - Real-time preview
+  - Customizable workspace
+  - Dark/Light theme support
 
 ## 🏗️ Project Structure
 
 ```
-src/
-├── components/          # React components
-│   ├── ColorPicker.js   # Color selection component
-│   └── Sidebar.js       # Sidebar with tools
-├── styles/             # CSS styles
-│   └── App.css         # Main stylesheet
-├── App.js              # Main application component
-└── index.js            # Application entry point
+DRAZE/
+├── src/                    # React application source
+│   ├── components/        # React components
+│   ├── styles/           # CSS styles
+│   └── App.js            # Main React component
+├── public/               # Static assets
+│   ├── index.html       # Main HTML file
+│   └── logo.ico         # Application icon
+├── headers/             # C/C++ header files
+│   ├── canvas/         # Canvas operations
+│   ├── main/          # Core functionality
+│   ├── sidebar/       # UI components
+│   └── css/          # Styling definitions
+├── main.c             # Main C application
+└── resources.rc       # Windows resource file
 ```
+
+## 📦 File Descriptions
+
+### Core Files
+- `main.c` - Main application entry point, handles GTK initialization and window management
+- `resources.rc` - Windows resource definitions for icons and metadata
+- `public/index.html` - Main HTML file with canvas setup and UI structure
+
+### Source Directories
+- `src/` - Contains React components and web application logic
+- `headers/` - C/C++ header files for native functionality
+- `public/` - Static assets and resources
 
 ## 🛠️ Technologies Used
 
-- React.js
-- Material-UI
-- HTML5 Canvas
-- CSS3
+- **Frontend** 🎯
+  - React.js
+  - Material-UI
+  - HTML5 Canvas
+  - CSS3
 
-### Project Structure
-
-- `main.c` - Main application entry point
-- `headers/` - Header files containing function declarations
-  - `canvas/` - Canvas-related functionality
-  - `sidebar/` - Sidebar tools and controls
-  - `main/` - Main window and core functionality
-  - `css/` - Styling and theming
-  - `buttons/` - Button implementations
-  - `headings/` - Title bar and headers
-
+- **Backend** ⚙️
+  - GTK (GIMP Toolkit)
+  - C/C++
+  - Windows API
 

@@ -3,19 +3,26 @@ import { Box } from '@mui/material';
 import Sidebar from './components/Sidebar';
 import './styles/App.css';
 
+/**
+ * Main application component that handles the drawing canvas and its functionality
+ * Manages drawing state, undo/redo operations, and canvas manipulation
+ */
 function App() {
   // State management for drawing properties
-  const [color, setColor] = useState('#000000');
-  const [lineWidth, setLineWidth] = useState(5);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [undoStack, setUndoStack] = useState([]);
-  const [redoStack, setRedoStack] = useState([]);
+  const [color, setColor] = useState('#000000');      // Current drawing color
+  const [lineWidth, setLineWidth] = useState(5);      // Current line width
+  const [isDrawing, setIsDrawing] = useState(false);  // Drawing state flag
+  const [undoStack, setUndoStack] = useState([]);     // Stack for undo operations
+  const [redoStack, setRedoStack] = useState([]);     // Stack for redo operations
   
-  // Canvas references
-  const canvasRef = useRef(null);
-  const contextRef = useRef(null);
+  // Canvas references for direct manipulation
+  const canvasRef = useRef(null);      // Reference to canvas element
+  const contextRef = useRef(null);     // Reference to canvas context
 
-  // Initialize canvas and context
+  /**
+   * Initialize canvas and drawing context
+   * Sets up canvas size and initial drawing properties
+   */
   useEffect(() => {
     const canvas = canvasRef.current;
     // Set canvas size to match container
@@ -23,18 +30,21 @@ function App() {
     canvas.height = canvas.offsetHeight;
 
     const context = canvas.getContext('2d');
-    // Configure drawing context
+    // Configure drawing context with initial settings
     context.lineCap = 'round';
     context.lineJoin = 'round';
     context.strokeStyle = color;
     context.lineWidth = lineWidth;
     contextRef.current = context;
 
-    // Save initial blank state
+    // Save initial blank state for undo functionality
     saveToUndoStack();
   }, []);
 
-  // Save current canvas state to undo stack
+  /**
+   * Saves current canvas state to undo stack
+   * Clears redo stack when new action is performed
+   */
   const saveToUndoStack = () => {
     if (canvasRef.current) {
       const imageData = canvasRef.current.toDataURL();
@@ -43,7 +53,9 @@ function App() {
     }
   };
 
-  // Drawing event handlers
+  /**
+   * Drawing event handlers
+   */
   const startDrawing = ({ nativeEvent }) => {
     const { offsetX, offsetY } = nativeEvent;
     contextRef.current.beginPath();
@@ -66,7 +78,9 @@ function App() {
     }
   };
 
-  // Canvas manipulation functions
+  /**
+   * Canvas manipulation functions
+   */
   const clearCanvas = () => {
     if (canvasRef.current) {
       const context = contextRef.current;
@@ -75,6 +89,10 @@ function App() {
     }
   };
 
+  /**
+   * Undo the last drawing action
+   * Moves current state to redo stack and restores previous state
+   */
   const undo = () => {
     if (undoStack.length > 1) {
       const newUndoStack = [...undoStack];
@@ -91,6 +109,10 @@ function App() {
     }
   };
 
+  /**
+   * Redo the last undone action
+   * Restores the most recent state from redo stack
+   */
   const redo = () => {
     if (redoStack.length > 0) {
       const newRedoStack = [...redoStack];
@@ -107,7 +129,9 @@ function App() {
     }
   };
 
-  // Save canvas as PNG
+  /**
+   * Save current canvas state as PNG image
+   */
   const saveCanvas = () => {
     if (canvasRef.current) {
       const link = document.createElement('a');
@@ -158,7 +182,7 @@ function App() {
           </Box>
         </Box>
         
-        {/* Control buttons */}
+        {/* Control buttons for canvas manipulation */}
         <Box className="controls">
           <button 
             className="control-button undo" 

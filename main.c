@@ -1,5 +1,6 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "headers/globals.h"
 
@@ -10,68 +11,71 @@
 #include "headers/sidebar/sidebar.h"
 #include "headers/main/userManual.h"
 
-// initializing global variables
+// Global variables for application state
+GtkWidget *window;              // Main application window
+struct FigureStack * figureStack;  // Stack to store drawn figures
+struct FigureStack * redoStack;    // Stack for redo functionality
+GtkWidget *canvas;              // Drawing canvas
+double *colorValue;             // Current color selection (RGB)
+double *lineWidth;              // Current line width
 
-GtkWidget *window;
-struct FigureStack * figureStack;
-struct FigureStack * redoStack;
-GtkWidget *canvas;
-double *colorValue;
-double *lineWidth;
-
+/**
+ * Main application entry point
+ * Initializes GTK, creates the main window, and sets up the application
+ * 
+ * @param argc Number of command line arguments
+ * @param argv Array of command line arguments
+ * @return int Exit status
+ */
 int main(int argc, char *argv[])
 {
-	// Initialize GTK
+	// Initialize GTK framework
 	gtk_init(&argc, &argv);
 
-	// creating a window
+	// Create and configure main application window
 	window = createWindow();
 	gtk_window_set_title(GTK_WINDOW(window), "Draze - Where Shapes Take Form");
 
-	// creating title bar
+	// Set up custom title bar with application controls
 	designTitleBar();
 
-	// loading css
+	// Load custom CSS styles for the application
 	load_CSS();
 
-	// creating figure Stack to store figures
+	// Initialize figure stack for storing drawn shapes
 	figureStack = createFigureStack();
 
-	// creating a redo stack for redoing the figures
+	// Initialize redo stack for undo/redo functionality
 	redoStack = createFigureStack();
 
-	// creating a global color array
+	// Initialize color array (RGB values)
 	colorValue = (double *)calloc(3, sizeof(double));
+	if (colorValue == NULL) {
+		fprintf(stderr, "Error: Failed to allocate memory for color values\n");
+		return 1;
+	}
 
-	// creating the line Width value
+	// Initialize line width with default value
 	lineWidth = (double *)malloc(sizeof(double));
+	if (lineWidth == NULL) {
+		fprintf(stderr, "Error: Failed to allocate memory for line width\n");
+		free(colorValue);
+		return 1;
+	}
 	*lineWidth = 1.0;
 
-	// create sidebar
+	// Create and set up the sidebar with drawing tools
 	GtkWidget *sidebar = createSideBar();
 
-	// show the main window
+	// Display the main window and all its components
 	gtk_widget_show_all(window);
 
-	//launching user manual
-	// GtkWidget *dialogBox = createUserManual();
-
-	// start the main gtk loop
+	// Start the GTK main event loop
 	gtk_main();
 
+	// Cleanup
+	free(colorValue);
+	free(lineWidth);
+
 	return 0;
-};
-
-int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv);
-
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Draze");
-    gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-
-    gtk_widget_show_all(window);
-    gtk_main();
-
-    return 0;
 }

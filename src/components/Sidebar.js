@@ -2,9 +2,19 @@ import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 import ColorPicker from './ColorPicker';
 
+/**
+ * Sidebar component that displays drawing properties and controls
+ * Shows current color, line width, and provides color picker interface
+ * 
+ * @param {string} color - Current selected color
+ * @param {function} onColorChange - Callback for color changes
+ * @param {number} lineWidth - Current line width
+ * @param {function} onLineWidthChange - Callback for line width changes
+ */
 const Sidebar = ({ color, onColorChange, lineWidth, onLineWidthChange }) => {
   return (
     <Box className="sidebar">
+      {/* Header section with title */}
       <Typography variant="h6" sx={{ 
         fontFamily: "'Poppins', sans-serif",
         fontWeight: 500,
@@ -16,6 +26,7 @@ const Sidebar = ({ color, onColorChange, lineWidth, onLineWidthChange }) => {
         Figure Data
       </Typography>
       
+      {/* Data display section showing current drawing properties */}
       <Paper 
         elevation={0} 
         sx={{ 
@@ -40,6 +51,7 @@ const Sidebar = ({ color, onColorChange, lineWidth, onLineWidthChange }) => {
         </pre>
       </Paper>
 
+      {/* Color picker component for color and line width controls */}
       <ColorPicker
         color={color}
         onColorChange={onColorChange}

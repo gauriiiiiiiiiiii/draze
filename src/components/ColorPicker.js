@@ -1,7 +1,17 @@
 import React from 'react';
 import { Box, Typography, Slider } from '@mui/material';
 
+/**
+ * ColorPicker component that provides color selection and line width control
+ * Features preset colors, custom color picker, and line width slider
+ * 
+ * @param {string} color - Current selected color
+ * @param {function} onColorChange - Callback for color changes
+ * @param {number} lineWidth - Current line width
+ * @param {function} onLineWidthChange - Callback for line width changes
+ */
 const ColorPicker = ({ color, onColorChange, lineWidth, onLineWidthChange }) => {
+  // Array of preset colors for quick selection
   const presetColors = [
     '#000000', // Black
     '#FF0000', // Red
@@ -17,17 +27,25 @@ const ColorPicker = ({ color, onColorChange, lineWidth, onLineWidthChange }) => 
     '#000080', // Navy
   ];
 
+  /**
+   * Handles click on preset color
+   * @param {string} selectedColor - The color that was clicked
+   */
   const handleColorClick = (selectedColor) => {
     onColorChange(selectedColor);
   };
 
+  /**
+   * Handles change in custom color picker
+   * @param {Event} e - The change event from the color input
+   */
   const handleCustomColorChange = (e) => {
     onColorChange(e.target.value);
   };
 
   return (
     <Box sx={{ p: 2, backgroundColor: '#f8f9fa', borderRadius: 2, mb: 2 }}>
-      {/* Color Bar */}
+      {/* Current color display and custom color picker */}
       <Box sx={{ 
         mb: 3,
         p: 2,
@@ -39,6 +57,7 @@ const ColorPicker = ({ color, onColorChange, lineWidth, onLineWidthChange }) => 
         gap: 2,
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
       }}>
+        {/* Color preview box */}
         <Box sx={{ 
           width: 60,
           height: 60,
@@ -56,6 +75,7 @@ const ColorPicker = ({ color, onColorChange, lineWidth, onLineWidthChange }) => 
           }}>
             Current Color
           </Typography>
+          {/* Custom color input */}
           <input
             type="color"
             value={color}
@@ -73,6 +93,7 @@ const ColorPicker = ({ color, onColorChange, lineWidth, onLineWidthChange }) => 
         </Box>
       </Box>
       
+      {/* Preset colors grid */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="subtitle1" sx={{ 
           mb: 1.5,
@@ -111,6 +132,7 @@ const ColorPicker = ({ color, onColorChange, lineWidth, onLineWidthChange }) => 
         </Box>
       </Box>
 
+      {/* Line width control slider */}
       <Box>
         <Typography variant="subtitle1" sx={{ 
           mb: 1.5,
